@@ -9,6 +9,8 @@ FrankGPT is a powerful VSCode extension that integrates the capabilities of Chat
 - **Customizable Interaction**: Tailor your ChatGPT experience with customizable settings.
 - **API Key Management**: Easily set or clear your OpenAI API key within the extension for secure and personalized usage.
 - **Model Selection**: Choose between different OpenAI models, including Ada, Babbage, Curie, Davinci, and a cost-effective GPT-3.5 model, to balance performance and cost.
+- **Contextual Assistance**: Get help related to specific code snippets in your editor for a more integrated coding experience.
+- **Automated Suggestions**: Receive real-time coding suggestions as you type, enhancing productivity and learning.
 
 ## Requirements
 
@@ -33,6 +35,11 @@ FrankGPT provides the following customizable settings:
 - Limited to English language queries for optimal results.
 
 ## Release Notes
+
+### 0.0.5
+
+- Introduced contextual assistance for code in the editor.
+- Added automated code suggestions based on real-time typing.
 
 ### 0.0.4
 

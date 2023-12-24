@@ -1,10 +1,14 @@
 {
   "name": "frankgpt",
   "displayName": "FrankGPT",
-  "description": "A DoD safer VSCode Extension for ChatGPT integration.",
-  "version": "0.0.4",
+  "description": "A DoD safe(r) VSCode Extension for ChatGPT integration.",
+  "version": "0.0.5",
   "publisher": "Frank Tudor",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/franktudor/FrankGPT.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
