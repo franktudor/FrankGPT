@@ -8,14 +8,14 @@ function setApiKey(context) {
     }).then(apiKey => {
         if (apiKey) {
             context.globalState.update('openaiApiKey', apiKey);
-            vscode.window.showInformationMessage('API Key set successfully.');
+            vscode.window.showInformationMessage('FrankGPT: ChatAPI Key set successfully. For better OpSec remember to clear your OpenAI API key by using FrankGPT: Clear API Key when you are done working.');
         }
     });
 }
 
 function clearApiKey(context) {
     context.globalState.update('openaiApiKey', undefined);
-    vscode.window.showInformationMessage('API Key cleared.');
+    vscode.window.showInformationMessage('FrankGPT: your ChatAPI Key has been cleared. Thank you for using my extenion! Add your API key again when you are ready to continue using FrankGPT.');
 }
 
 module.exports = {
