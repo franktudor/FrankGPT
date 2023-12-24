@@ -29,10 +29,16 @@ const getGPTResponse = async (prompt, apiKey, selectedModel) => {
         });
 
         if (selectedModel === 'gpt-3.5-turbo') {
-            return response.data.choices.find(choice => choice.message.role === 'assistant')?.message.content.trim();
+            const assistantResponse = response.data.choices.find(choice => choice.message.role === 'assistant');
+            if (assistantResponse && assistantResponse.message) {
+                return assistantResponse.message.content.trim();
+            } else {
+                return ''; // Or handle the absence of an assistant response appropriately
+            }
         } else {
             return response.data.choices[0].text.trim();
         }
+        
     } catch (error) {
         // [existing error handling code]
     }
