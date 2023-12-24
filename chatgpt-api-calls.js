@@ -1,13 +1,17 @@
 const axios = require('axios');
 
-const getGPTResponse = async (prompt) => {
+const getGPTResponse = async (prompt, apiKey) => {
+    if (!apiKey) {
+        throw new Error('No API key provided. Please set your API key.');
+    }
+
     try {
         const response = await axios.post('https://api.openai.com/v1/engines/text-ada-001/completions', {
             prompt: prompt,
             max_tokens: 150
         }, {
             headers: {
-                'Authorization': 'Bearer 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'  // Replace YOUR_API_KEY with your actual API key
+                'Authorization': `Bearer ${apiKey}`
             }
         });
         return response.data.choices[0].text.trim();
