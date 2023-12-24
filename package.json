@@ -2,8 +2,9 @@
   "name": "frankgpt",
   "displayName": "FrankGPT",
   "description": "A DoD safer VSCode Extension for ChatGPT integration.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "Frank Tudor",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -15,7 +16,8 @@
     "onCommand:frankgpt.helloWorld",
     "onCommand:frankgpt.askGPT",
     "onCommand:frankgpt.setApiKey",
-    "onCommand:frankgpt.clearApiKey"
+    "onCommand:frankgpt.clearApiKey",
+    "onCommand:frankgpt.selectModel"
   ],
   "contributes": {
     "commands": [
@@ -34,6 +36,10 @@
       {
         "command": "frankgpt.clearApiKey",
         "title": "Clear API Key"
+      },
+      {
+        "command": "frankgpt.selectModel",
+        "title": "Select OpenAI Model"
       }
     ]
   },

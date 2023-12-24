@@ -7,7 +7,8 @@ FrankGPT is a powerful VSCode extension that integrates the capabilities of Chat
 - **ChatGPT Integration**: Direct access to ChatGPT from within VSCode. Just type your query and get instant AI-powered responses.
 - **Efficient Coding Assistance**: Get coding suggestions, explanations, and quick answers to your programming questions.
 - **Customizable Interaction**: Tailor your ChatGPT experience with customizable settings.
-- **API Key Management**: Easily set or clear your OpenAI API key within the extension.
+- **API Key Management**: Easily set or clear your OpenAI API key within the extension for secure and personalized usage.
+- **Model Selection**: Choose between different OpenAI models, including Ada, Babbage, Curie, Davinci, and a cost-effective GPT-3.5 model, to balance performance and cost.
 
 ## Requirements
 
@@ -20,6 +21,11 @@ FrankGPT provides the following customizable settings:
 
 - `frankgpt.enable`: Enable or disable the ChatGPT integration.
 - `frankgpt.maxTokens`: Configure the maximum number of tokens (words) in the ChatGPT response.
+- **API Key Management**:
+  - `frankgpt.setApiKey`: Set your OpenAI API key.
+  - `frankgpt.clearApiKey`: Clear the stored OpenAI API key.
+- **Model Selection**:
+  - `frankgpt.selectModel`: Choose an AI model for different performance and cost options.
 
 ## Known Issues
 
@@ -27,6 +33,11 @@ FrankGPT provides the following customizable settings:
 - Limited to English language queries for optimal results.
 
 ## Release Notes
+
+### 0.0.4
+
+- Added functionality to select different OpenAI models, including Ada, Babbage, Curie, Davinci, and a cost-effective GPT-3.5 model.
+- Improved API key management with commands to set and clear the key.
 
 ### 0.0.3
 
@@ -56,3 +67,7 @@ This README is written using Markdown, making it easy to update and maintain. He
 - [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy coding with FrankGPT at your fingertips!**
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
