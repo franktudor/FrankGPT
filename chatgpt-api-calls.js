@@ -6,7 +6,7 @@ const getGPTResponse = async (prompt, apiKey, selectedModel) => {
     }
 
     try {
-        const model = selectedModel || 'text-ada-001'; // Default to ADA if no model selected since it costs so little per request.
+        const model = selectedModel || 'text-ada-001';
 
         const response = await axios.post(`https://api.openai.com/v1/engines/${model}/completions`, {
             prompt: prompt,
@@ -22,29 +22,28 @@ const getGPTResponse = async (prompt, apiKey, selectedModel) => {
             // Handle known HTTP errors
             switch (error.response.status) {
                 case 400:
-                    console.error('Bad Request:', error.response.data);
-                    throw new Error('Bad Request. Please check your input.');
+                    throw new Error('Bad Request: The server cannot process the request due to a client error. Check your input for correctness.');
                 case 401:
-                    console.error('Unauthorized:', error.response.data);
-                    throw new Error('Unauthorized. Check your API key.');
+                    throw new Error('Unauthorized: Your API key is invalid or not provided. Verify that your API key is correct.');
                 case 403:
-                    console.error('Forbidden:', error.response.data);
-                    throw new Error('Forbidden. You do not have permission to access this resource.');
+                    throw new Error('Forbidden: You do not have permission to access this resource with the provided API key.');
                 case 429:
-                    console.error('Rate Limit Exceeded:', error.response.data);
-                    throw new Error('Rate limit exceeded. Please try again later.');
+                    if (error.response.data.error.includes('Rate limit reached')) {
+                        throw new Error('Rate Limit Exceeded: You have hit your assigned rate limit. Pace your requests.');
+                    } else if (error.response.data.error.includes('You exceeded your current quota')) {
+                        throw new Error('Quota Exceeded: You have exceeded your current quota. Check your plan and billing details.');
+                    } else {
+                        throw new Error('Server Overload: The engine is currently overloaded. Please try again later.');
+                    }
+                case 500:
+                    throw new Error('Internal Server Error: The server had an error while processing your request. Retry after a brief wait.');
                 default:
-                    console.error('Error communicating with ChatGPT:', error.response.data);
-                    throw new Error('An error occurred while communicating with the API.');
+                    throw new Error(`Unexpected Error: ${error.response.status} - ${error.response.data.error}`);
             }
         } else if (error.request) {
-            // The request was made but no response was received
-            console.error('No response received:', error.request);
-            throw new Error('No response from the server. Please check your network connection.');
+            throw new Error('No response received: The request was made but no response was received. Check your network connection.');
         } else {
-            // Something happened in setting up the request that triggered an error
-            console.error('Error setting up request:', error.message);
-            throw new Error('Error in setting up the API request.');
+            throw new Error(`Request setup error: ${error.message}`);
         }
     }
 };
