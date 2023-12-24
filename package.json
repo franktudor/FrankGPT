@@ -1,0 +1,46 @@
+{
+  "name": "frankgpt",
+  "displayName": "FrankGPT",
+  "description": "A DoD safer VSCode Extension for ChatGPT integration.",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:frankgpt.helloWorld",
+    "onCommand:frankgpt.askGPT"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "frankgpt.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "frankgpt.askGPT",
+        "title": "Ask FrankGPT"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.2"
+  }
+}
