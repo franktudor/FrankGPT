@@ -6,9 +6,15 @@ const getGPTResponse = async (prompt, apiKey, selectedModel) => {
     }
 
     try {
-        const model = selectedModel || 'text-ada-001';
+        let url;
+        if (selectedModel === 'gpt-3.5-turbo') {
+            url = `https://api.openai.com/v1/chat/completions`; // Endpoint for GPT-3.5 Turbo
+        } else {
+            url = `https://api.openai.com/v1/engines/${selectedModel}/completions`; // Endpoint for other models
+        }
 
-        const response = await axios.post(`https://api.openai.com/v1/engines/${model}/completions`, {
+        const response = await axios.post(url, {
+            model: selectedModel,
             prompt: prompt,
             max_tokens: 150
         }, {
