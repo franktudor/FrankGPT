@@ -1,12 +1,14 @@
 const axios = require('axios');
 
-const getGPTResponse = async (prompt, apiKey) => {
+const getGPTResponse = async (prompt, apiKey, selectedModel) => {
     if (!apiKey) {
         throw new Error('No API key provided. Please set your API key.');
     }
 
     try {
-        const response = await axios.post('https://api.openai.com/v1/engines/text-ada-001/completions', {
+        const model = selectedModel || 'text-ada-001'; // Default to ADA if no model selected since it costs so little per request.
+
+        const response = await axios.post(`https://api.openai.com/v1/engines/${model}/completions`, {
             prompt: prompt,
             max_tokens: 150
         }, {

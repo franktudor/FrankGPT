@@ -1,8 +1,14 @@
 {
   "name": "frankgpt",
   "displayName": "FrankGPT",
-  "description": "A DoD safer VSCode Extension for ChatGPT integration.",
-  "version": "0.0.2",
+  "description": "A DoD safe(r) VSCode Extension for ChatGPT integration.",
+  "version": "0.0.5",
+  "publisher": "Frank Tudor",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/franktudor/FrankGPT.git"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -41,6 +47,12 @@
         "title": "FrankGPT: Clear API Key",
         "category": "FrankGPT",
         "description": "Clear the stored OpenAI API key from your VSCode settings. Use this when you need to change the key or remove it for security purposes."
+      },
+      {
+        "command": "frankgpt.selectModel",
+        "title": "FrankGPT: Select Model",
+        "category": "FrankGPT",
+        "description": "Select an OpenAI GPT model to use for generating responses."
       }
     ]
   },  
