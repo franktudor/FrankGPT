@@ -20,9 +20,19 @@
     "onCommand:frankgpt.helloWorld",
     "onCommand:frankgpt.askGPT",
     "onCommand:frankgpt.setApiKey",
-    "onCommand:frankgpt.clearApiKey"
+    "onCommand:frankgpt.clearApiKey",
+    "onCommand:frankgpt.analyzeCode"
   ],
   "contributes": {
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorTextFocus",
+          "command": "frankgpt.analyzeCode",
+          "group": "navigation"
+        }
+      ]
+    },    
     "commands": [
       {
         "command": "frankgpt.helloWorld",
@@ -53,6 +63,12 @@
         "title": "FrankGPT: Select Model",
         "category": "FrankGPT",
         "description": "Select an OpenAI GPT model to use for generating responses."
+      },
+      {
+        "command": "frankgpt.analyzeCode",
+        "title": "FrankGPT: Analyze Code",
+        "category": "FrankGPT",
+        "description": "Analyze the selected code block using FrankGPT."
       }
     ]
   },  
