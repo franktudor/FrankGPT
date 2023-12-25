@@ -32,7 +32,7 @@
           "group": "navigation"
         }
       ]
-    },    
+    },
     "commands": [
       {
         "command": "frankgpt.helloWorld",
@@ -71,11 +71,16 @@
         "description": "Analyze the selected code block using FrankGPT."
       }
     ]
-  },  
+  },
   "keybindings": [
     {
       "command": "frankgpt.askGPT",
       "key": "ctrl+f10",
+      "when": "editorTextFocus"
+    },
+    {
+      "command": "frankgpt.analyzeCode",
+      "key": "ctrl+alt+a",
       "when": "editorTextFocus"
     }
   ],
