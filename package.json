@@ -2,7 +2,7 @@
   "name": "frankgpt",
   "displayName": "FrankGPT",
   "description": "An (unsupported, unfunded and unrequested) DoD safe(r) VSCode Extension for ChatGPT integration by a nervous DoD person.",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "Frank Tudor",
   "license": "MIT",
   "repository": {
