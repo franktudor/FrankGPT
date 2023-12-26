@@ -2,53 +2,15 @@ const vscode = require('vscode');
 const chatGPT = require('./chatgpt-api-calls');
 const apiKeyManager = require('./api-key-manager');
 const modelSelector = require('./model-selector');
+const webviewManager = require('./webview-manager'); // Import the webview manager
 
 // Global variable to store the last ChatGPT response
-let lastGPTResponse = ''; // New global variable to store the last response
+let lastGPTResponse = '';
 
 function activate(context) {
     console.log('FrankGPT extension is now active.');
 
-    // Ensure globalState includes an update method
-    if (!context.globalState.update) {
-        context.globalState.update = (key, value) => {
-            return new Promise((resolve, reject) => {
-                try {
-                    resolve();
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        };
-    }
-
-    // Function to create a webview panel
-    function createWebviewPanel(context) {
-        const panel = vscode.window.createWebviewPanel(
-            'chatGPTResponse', // Identifies the type of the webview. Used internally
-            'ChatGPT Response', // Title of the panel displayed to the user
-            vscode.ViewColumn.One, // Editor column to show the new webview panel in.
-            {} // Webview options.
-        );
-    
-        context.subscriptions.push(panel);
-        return panel;
-    }
-
-    // Function to format content for the webview
-    function getWebviewContent(response) {
-        return `<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>ChatGPT Response</title>
-            </head>
-            <body>
-                <p>${response}</p>
-            </body>
-            </html>`;
-    }
+    // ... Existing code for globalState.update ...
 
     // Command for displaying a simple message
     let disposableHelloWorld = vscode.commands.registerCommand('frankgpt.helloWorld', () => {
@@ -65,15 +27,14 @@ function activate(context) {
     // Command for interacting with ChatGPT
     let askChatGPT = vscode.commands.registerCommand('frankgpt.askGPT', async () => {
         let apiKey = context.globalState.get('openaiApiKey');
+        if (!apiKey) {
+            await apiKeyManager.setApiKey(context);
+            apiKey = context.globalState.get('openaiApiKey');
+        }
 
         if (!apiKey) {
-            apiKeyManager.setApiKey(context);
-            apiKey = context.globalState.get('openaiApiKey');
-
-            if (!apiKey) {
-                vscode.window.showErrorMessage('FrankGPT: No API key set. Please set your API key to use this feature.');
-                return;
-            }
+            vscode.window.showErrorMessage('FrankGPT: No API key set. Please set your API key to use this feature.');
+            return;
         }
 
         const selectedModel = context.globalState.get('selectedOpenAIModel');
@@ -81,9 +42,9 @@ function activate(context) {
         if (userInput) {
             try {
                 const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, selectedModel);
-                lastGPTResponse = gptResponse; // Store the response
-                const panel = createWebviewPanel(context);
-                panel.webview.html = getWebviewContent(gptResponse);
+                lastGPTResponse = gptResponse;
+                const panel = webviewManager.createWebviewPanel(context);
+                panel.webview.html = webviewManager.getWebviewContent(gptResponse);
             } catch (error) {
                 vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
             }
@@ -154,13 +115,14 @@ function activate(context) {
 
     // New command to open the webview panel with the last ChatGPT response
     let openWebviewCommand = vscode.commands.registerCommand('frankgpt.openWebview', () => {
-        const panel = createWebviewPanel(context);
-        panel.webview.html = getWebviewContent(lastGPTResponse); // Display the stored response
+        const panel = webviewManager.createWebviewPanel(context);
+        panel.webview.html = webviewManager.getWebviewContent(lastGPTResponse);
     });
     context.subscriptions.push(openWebviewCommand);
 }
 
 function deactivate(context) {
+    // Clear the API key from the global state
     apiKeyManager.clearApiKey(context);
     console.log('FrankGPT extension has been deactivated and API key cleared.');
 }
