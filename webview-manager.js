@@ -12,18 +12,21 @@ function createWebviewPanel(context) {
     return panel;
 }
 
-function getWebviewContent(response) {
-    return `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>ChatGPT Response</title>
-        </head>
-        <body>
-            <p>${response}</p>
-        </body>
-        </html>`;
+function getWebviewContent(userInput, response) {
+  return `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>ChatGPT Interaction</title>
+      </head>
+      <body>
+          <h2>User Input:</h2>
+          <p>${userInput}</p>
+          <h2>ChatGPT Response:</h2>
+          <p>${response}</p>
+      </body>
+      </html>`;
 }
 
 module.exports = {

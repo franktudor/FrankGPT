@@ -24,13 +24,11 @@ const MODELS = {
 };
 
 async function selectModel(context) {
-    const modelItems = Object.keys(MODELS).map(key => {
-        return {
-            label: key.charAt(0).toUpperCase() + key.slice(1),
-            detail: MODELS[key].description,
-            modelId: MODELS[key].name
-        };
-    });
+    const modelItems = Object.entries(MODELS).map(([key, value]) => ({
+        label: `${key.charAt(0).toUpperCase()}${key.slice(1)}`,
+        detail: value.description,
+        modelId: value.name
+    }));
 
     const selected = await vscode.window.showQuickPick(modelItems, {
         placeHolder: 'Select an OpenAI model',
@@ -38,7 +36,7 @@ async function selectModel(context) {
     });
 
     if (selected) {
-        context.globalState.update('selectedOpenAIModel', selected.modelId);
+        await context.globalState.update('selectedOpenAIModel', selected.modelId);
         vscode.window.showInformationMessage(`Selected model: ${selected.label}`);
     }
 }

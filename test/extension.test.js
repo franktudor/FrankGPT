@@ -1,5 +1,6 @@
 const assert = require('assert');
 const vscode = require('vscode');
+const sinon = require('sinon'); // Import Sinon
 const { activate, deactivate } = require('../extension');
 
 suite('Extension Test Suite', () => {
@@ -9,6 +10,23 @@ suite('Extension Test Suite', () => {
 	test('Sample test', () => {
 		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
 		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+	});
+
+	test('Capture User Input', async () => {
+		let context = new MockMemento();
+		const showInputBoxStub = sinon.stub(vscode.window, 'showInputBox').resolves("Test Query");
+
+		// Simulate activating the extension
+		await activate(context);
+
+		// Simulate calling the askChatGPT command
+		await vscode.commands.executeCommand('frankgpt.askGPT');
+
+		// Verify the effect of the command (e.g., webview content, state change)
+		// ...
+
+		// Restore the stubbed method
+		showInputBoxStub.restore();
 	});
 
 	test('Extension Activation', async () => {
@@ -54,6 +72,7 @@ suite('Extension Test Suite', () => {
 class MockMemento {
 	constructor() {
 		this.state = {};
+		this.subscriptions = []; // Mock subscriptions array
 	}
 
 	get(key) {
