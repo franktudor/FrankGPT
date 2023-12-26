@@ -30,6 +30,11 @@
           "when": "editorTextFocus",
           "command": "frankgpt.analyzeCode",
           "group": "navigation"
+        },
+        {
+          "when": "editorTextFocus",
+          "command": "frankgpt.openWebview",
+          "group": "navigation"
         }
       ]
     },
@@ -69,6 +74,12 @@
         "title": "FrankGPT: Analyze Code",
         "category": "FrankGPT",
         "description": "Analyze the selected code block using FrankGPT."
+      },
+      {
+        "command": "frankgpt.openWebview",
+        "title": "FrankGPT: Open Webview",
+        "category": "FrankGPT",
+        "description": "Open the ChatGPT response in a webview panel."
       }
     ]
   },

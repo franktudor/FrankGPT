@@ -1,30 +1,53 @@
-///analysis start
 const vscode = require('vscode');
 const chatGPT = require('./chatgpt-api-calls');
 const apiKeyManager = require('./api-key-manager');
 const modelSelector = require('./model-selector');
 
-/**
- * @param {{ subscriptions: vscode.Disposable[]; globalState: { get: (arg0: string) => any; update: (arg0: string, arg1: any) => Thenable<void>; }; }} context
- */
+// Global variable to store the last ChatGPT response
+let lastGPTResponse = ''; // New global variable to store the last response
+
 function activate(context) {
     console.log('FrankGPT extension is now active.');
 
     // Ensure globalState includes an update method
     if (!context.globalState.update) {
-        // eslint-disable-next-line no-unused-vars
         context.globalState.update = (key, value) => {
-            // Implement the logic to update the global state here
-            // Return a Thenable<void>
             return new Promise((resolve, reject) => {
                 try {
-                    // Asynchronous state update logic goes here.
                     resolve();
                 } catch (error) {
                     reject(error);
                 }
             });
         };
+    }
+
+    // Function to create a webview panel
+    function createWebviewPanel(context) {
+        const panel = vscode.window.createWebviewPanel(
+            'chatGPTResponse', // Identifies the type of the webview. Used internally
+            'ChatGPT Response', // Title of the panel displayed to the user
+            vscode.ViewColumn.One, // Editor column to show the new webview panel in.
+            {} // Webview options.
+        );
+    
+        context.subscriptions.push(panel);
+        return panel;
+    }
+
+    // Function to format content for the webview
+    function getWebviewContent(response) {
+        return `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>ChatGPT Response</title>
+            </head>
+            <body>
+                <p>${response}</p>
+            </body>
+            </html>`;
     }
 
     // Command for displaying a simple message
@@ -45,7 +68,7 @@ function activate(context) {
 
         if (!apiKey) {
             apiKeyManager.setApiKey(context);
-            apiKey = context.globalState.get('openaiApiKey'); // Re-fetch the API key
+            apiKey = context.globalState.get('openaiApiKey');
 
             if (!apiKey) {
                 vscode.window.showErrorMessage('FrankGPT: No API key set. Please set your API key to use this feature.');
@@ -58,7 +81,9 @@ function activate(context) {
         if (userInput) {
             try {
                 const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, selectedModel);
-                vscode.window.showInformationMessage(gptResponse);
+                lastGPTResponse = gptResponse; // Store the response
+                const panel = createWebviewPanel(context);
+                panel.webview.html = getWebviewContent(gptResponse);
             } catch (error) {
                 vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
             }
@@ -90,7 +115,6 @@ function activate(context) {
         let lines = text.split('\n');
         let startIndex = -1, endIndex = -1;
 
-        // Find start and end indices of the analysis block
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].includes('///analysis start') && startIndex === -1) {
                 startIndex = i;
@@ -105,7 +129,6 @@ function activate(context) {
             return;
         }
 
-        // Extract the code block
         let selectedCode = lines.slice(startIndex + 1, endIndex).join('\n');
 
         let apiKey = context.globalState.get('openaiApiKey');
@@ -121,16 +144,23 @@ function activate(context) {
         try {
             const selectedModel = context.globalState.get('selectedOpenAIModel');
             const gptResponse = await chatGPT.getGPTResponse(selectedCode, apiKey, selectedModel);
-            vscode.window.showInformationMessage(gptResponse);
+            lastGPTResponse = gptResponse; // Store the response
+            // You might want to open the webview here as well
         } catch (error) {
             vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
         }
     });
     context.subscriptions.push(analyzeCodeCommand);
+
+    // New command to open the webview panel with the last ChatGPT response
+    let openWebviewCommand = vscode.commands.registerCommand('frankgpt.openWebview', () => {
+        const panel = createWebviewPanel(context);
+        panel.webview.html = getWebviewContent(lastGPTResponse); // Display the stored response
+    });
+    context.subscriptions.push(openWebviewCommand);
 }
 
 function deactivate(context) {
-    // Clear the API key from the global state
     apiKeyManager.clearApiKey(context);
     console.log('FrankGPT extension has been deactivated and API key cleared.');
 }
@@ -139,4 +169,3 @@ module.exports = {
     activate,
     deactivate
 };
-///analysis end
