@@ -35,7 +35,7 @@ function activate(context) {
 
         let apiKey = context.globalState.get('openaiApiKey');
         if (!apiKey) {
-            await apiKeyManager.setApiKey(context);
+            apiKeyManager.setApiKey(context);
             apiKey = context.globalState.get('openaiApiKey');
             if (!apiKey) {
                 vscode.window.showErrorMessage('FrankGPT: No API key set. Please set your API key to use this feature.');

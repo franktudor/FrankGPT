@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const getGPTResponse = async (prompt, apiKey, selectedModel) => {
+const getGPTResponse = async (/** @type {any} */ prompt, /** @type {any} */ apiKey, /** @type {string} */ selectedModel) => {
     if (!apiKey) {
         throw new Error('No API key provided. Please set your API key.');
     }

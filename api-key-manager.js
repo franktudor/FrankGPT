@@ -1,5 +1,8 @@
 const vscode = require('vscode');
 
+/**
+ * @param {{ globalState: { update: (arg0: string, arg1: string) => void; }; }} context
+ */
 function setApiKey(context) {
     vscode.window.showInputBox({
         prompt: 'Enter your OpenAI API key',
@@ -13,6 +16,9 @@ function setApiKey(context) {
     });
 }
 
+/**
+ * @param {{ globalState: { update: (arg0: string, arg1: any) => void; }; }} context
+ */
 function clearApiKey(context) {
     context.globalState.update('openaiApiKey', undefined);
     vscode.window.showInformationMessage('FrankGPT: your ChatAPI Key has been cleared. Thank you for using my extenion! Add your API key again when you are ready to continue using FrankGPT.');

@@ -1,11 +1,30 @@
-///analysis start
 const vscode = require('vscode');
 const chatGPT = require('./chatgpt-api-calls');
 const apiKeyManager = require('./api-key-manager');
 const modelSelector = require('./model-selector');
 
+/**
+ * @param {{ subscriptions: vscode.Disposable[]; globalState: { get: (arg0: string) => any; update: (arg0: string, arg1: any) => Thenable<void>; }; }} context
+ */
 function activate(context) {
     console.log('FrankGPT extension is now active.');
+
+    // Ensure globalState includes an update method
+    if (!context.globalState.update) {
+        // eslint-disable-next-line no-unused-vars
+        context.globalState.update = (key, value) => {
+            // Implement the logic to update the global state here
+            // Return a Thenable<void>
+            return new Promise((resolve, reject) => {
+                try {
+                    // Asynchronous state update logic goes here.
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        };
+    }
 
     // Command for displaying a simple message
     let disposableHelloWorld = vscode.commands.registerCommand('frankgpt.helloWorld', () => {
@@ -24,7 +43,7 @@ function activate(context) {
         let apiKey = context.globalState.get('openaiApiKey');
 
         if (!apiKey) {
-            await apiKeyManager.setApiKey(context);
+            apiKeyManager.setApiKey(context);
             apiKey = context.globalState.get('openaiApiKey'); // Re-fetch the API key
 
             if (!apiKey) {
@@ -32,6 +51,7 @@ function activate(context) {
                 return;
             }
         }
+
         const selectedModel = context.globalState.get('selectedOpenAIModel');
         const userInput = await vscode.window.showInputBox({ prompt: 'Ask me anything' });
         if (userInput) {
@@ -68,7 +88,6 @@ function activate(context) {
         let text = editor.document.getText();
         let lines = text.split('\n');
         let startIndex = -1, endIndex = -1;
-        let selectedCode = '';
 
         // Find start and end indices of the analysis block
         for (let i = 0; i < lines.length; i++) {
@@ -86,11 +105,11 @@ function activate(context) {
         }
 
         // Extract the code block
-        selectedCode = lines.slice(startIndex + 1, endIndex).join('\n');
+        let selectedCode = lines.slice(startIndex + 1, endIndex).join('\n');
 
         let apiKey = context.globalState.get('openaiApiKey');
         if (!apiKey) {
-            await apiKeyManager.setApiKey(context);
+            apiKeyManager.setApiKey(context);
             apiKey = context.globalState.get('openaiApiKey');
             if (!apiKey) {
                 vscode.window.showErrorMessage('FrankGPT: No API key set. Please set your API key to use this feature.');
@@ -107,7 +126,6 @@ function activate(context) {
         }
     });
     context.subscriptions.push(analyzeCodeCommand);
-
 }
 
 function deactivate(context) {
@@ -120,4 +138,3 @@ module.exports = {
     activate,
     deactivate
 };
-///analysis end
