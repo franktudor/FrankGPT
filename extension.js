@@ -1,3 +1,4 @@
+///analysis start
 const vscode = require('vscode');
 const chatGPT = require('./chatgpt-api-calls');
 const apiKeyManager = require('./api-key-manager');
@@ -138,3 +139,4 @@ module.exports = {
     activate,
     deactivate
 };
+///analysis end
