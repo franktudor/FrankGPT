@@ -32,7 +32,7 @@ FrankGPT is a sophisticated VSCode extension that seamlessly integrates OpenAI's
 
 ## Code Analysis
 
-Trap a segment of code with `///analysis start` ...code... `///analysis end` Then do `CTRL` + `ALT` + `A`
+First you must select the ChatGPT 3.5 Turbo then have a file opened in an editor then trap a segment of code with `///analysis start` ...code... `///analysis end` Then do `CTRL` + `ALT` + `A` or `FrankGPT: Analyze Code` and wait for the response.
 
 ## Known Issues
 
