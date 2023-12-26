@@ -30,6 +30,10 @@ FrankGPT is a sophisticated VSCode extension that seamlessly integrates OpenAI's
   - **Davinci**: Highest quality for the most complex tasks, most expensive.
   - **GPT-3.5 Turbo**: Advanced tasks with an optimized balance of performance and cost.
 
+## Code Analysis
+
+Trap a segment of code with `///analysis start` ...code... `///analysis end` Then do `CTRL` + `ALT` + `A`
+
 ## Known Issues
 
 - Slow responses under poor network conditions.
@@ -82,33 +86,33 @@ Licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Some Notes on Work Done and Concepts Explored
 
-1. **Error Resolution in api-key-manager.js**: Corrected the use of the context object to resolve an error in your extension.
-2. **Code Review and Fixes**: Reviewed and provided fixes for `api-key-manager.js`, `chat-gpt-api-calls.js`, and `extension.js` to implement user prompting for an OpenAI API key.
+1. **Error Resolution in api-key-manager.js**: Corrected use of `context` object to resolve an error the extension.
+2. **Code Review and Fixes**: Fixes for `api-key-manager.js`, `chat-gpt-api-calls.js`, and `extension.js` to implement user prompting for an OpenAI API key.
 3. **API Key Prompt Enhancement**: Modified the extension to prompt users for an API key, enhancing user experience.
 4. **Improved Error Handling**: Enhanced error messages in `chat-gpt-api-calls.js` for better user guidance.
 5. **Package.json Updates**:
     - Added commands for API key management in `activationEvents` and `contributes.commands`.
     - Included keywords for improved extension discoverability.
-6. **Command Discoverability and Usability**: Discussed strategies for making commands more user-friendly and discoverable in the Command Palette.
+6. **Command Discoverability and Usability**: Worked through strategies for making commands more user-friendly and discoverable in the Command Palette.
 7. **Code Refinements**:
     - Improved naming conventions for clarity.
     - Added detailed command descriptions for the Command Palette.
-    - Discussed the purpose of the keybindings section in `package.json`.
-8. **Final Code Integration**: Integrated all improvements into `extension.js` for a seamless user experience, focusing on API key setup and usage.
+    - Fixed keybindings section in `package.json`.
+8. **Final Code Integration**: Integrated incremental improvements into `extension.js` for a seamless user experience, focusing on API key setup and usage.
 9. **VS Code Plugins for Local Imports**: Explored how to build extensions for managing local imports and other code tasks.
-10. **JavaScript Type Checking in 'jsconfig.json'**: Discussed enabling JavaScript type checking in your project configuration.
-11. **Choice of JavaScript Package Manager**: Compared npm and Yarn, offering insights for package management decision.
-12. **ChatGPT API Overview**: Provided an overview of OpenAI Assistants API for integration in your extension.
+10. **JavaScript Type Checking in 'jsconfig.json'**: Enabled JavaScript type checking in the project configuration.
+11. **Choice of JavaScript Package Manager**: Compared npm and Yarn, offering insights for package management decision. stayed with NPM. PNPM did not work well.
+12. **ChatGPT API Overview**: Tooled with OpenAI Assistants API for integration in the extension.
 13. **Free Text Generation Model Options**: Explored various free or cost-effective AI tools for text generation, including OpenAI's GPT-3 Playground.
-14. **Working with OpenAI GPT-3 Playground**: Guided on using and integrating OpenAI's GPT-3 Playground with your extension.
+14. **Working with OpenAI GPT-3 Playground**: Guided on using and integrating OpenAI's GPT-3 Playground with the extension.
 15. **JavaScript and Node.js Setup**: Assisted in setting up Node.js and npm, including troubleshooting.
 16. **ChatGPT API Integration**: Covered the integration of OpenAI's ChatGPT API, including API requests, key management, and model selection.
 17. **Extension Functionalities**: Worked on features like model selection, API key management, and query handling.
-18. **Code Review and Debugging**: Reviewed and debugged multiple JavaScript files of your extension for best practices and error handling.
+18. **Code Review and Debugging**: Reviewed and debugged multiple JavaScript files of the extension for best practices and error handling.
 19. **Package.json Configuration**: Updated `package.json` with repository details, versioning, and licensing.
 20. **General Guidance and Tips**: Provided advice on extension development, best practices, and effective use of VSCode features.
 21. **Troubleshooting**: Addressed various issues, offering solutions and suggestions.
-22. **Building a .vsix File**: Discussed using the vsce package for building your extension file.
+22. **Building a .vsix File**: Discussed using the vsce package for building the extension file.
 23. **Extension Deactivation Behavior**: Covered best practices for API key management upon deactivation.
 24. **Extension Tests**: Advised on setting up and conducting tests using the VS Code testing framework.
 25. **Launch Configuration for Testing**: Reviewed the `launch.json` configuration for testing and development environments.
