@@ -4,8 +4,10 @@ const apiKeyManager = require('./api-key-manager');
 const modelSelector = require('./model-selector');
 const webviewManager = require('./webview-manager');
 
-let lastUserInput = '';
-let lastGPTResponse = '';
+let conversationHistory = {
+    inputs: [],
+    responses: []
+};
 
 function activate(context) {
     console.log('FrankGPT extension is now active.');
@@ -17,6 +19,15 @@ function activate(context) {
     registerCommand(context, 'frankgpt.clearApiKey', () => apiKeyManager.clearApiKey(context));
     registerCommand(context, 'frankgpt.analyzeCode', () => handleAnalyzeCode(context));
     registerCommand(context, 'frankgpt.openWebview', () => handleOpenWebview(context));
+
+    // Update to handle message from the webview
+    context.subscriptions.push(vscode.window.registerWebviewPanelSerializer('chatGPTResponse', {
+        async deserializeWebviewPanel(webviewPanel, state) {
+            // Use state if needed to restore webview state
+            webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+            setupMessageListener(webviewPanel, context);
+        }
+    }));
 }
 
 function deactivate(context) {
@@ -41,10 +52,11 @@ async function handleAskGPT(context) {
     if (userInput) {
         try {
             const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, context.globalState.get('selectedOpenAIModel'));
-            lastUserInput = userInput;
-            lastGPTResponse = gptResponse;
+            conversationHistory.inputs.push(userInput);
+            conversationHistory.responses.push(gptResponse);
             const panel = webviewManager.createWebviewPanel(context);
-            panel.webview.html = webviewManager.getWebviewContent(userInput, gptResponse);
+            panel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+            setupMessageListener(panel, context);
         } catch (error) {
             vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
         }
@@ -67,7 +79,8 @@ async function handleAnalyzeCode(context) {
     const selectedCode = lines.slice(startIndex + 1, endIndex).join('\n');
     try {
         const gptResponse = await chatGPT.getGPTResponse(selectedCode, await getApiKey(context), context.globalState.get('selectedOpenAIModel'));
-        lastGPTResponse = gptResponse;
+        conversationHistory.inputs.push(selectedCode);
+        conversationHistory.responses.push(gptResponse);
         // Consider showing response in a webview here as well
     } catch (error) {
         vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
@@ -76,8 +89,56 @@ async function handleAnalyzeCode(context) {
 
 function handleOpenWebview(context) {
     const panel = webviewManager.createWebviewPanel(context);
-    panel.webview.html = webviewManager.getWebviewContent(lastUserInput, lastGPTResponse);
+    panel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+    setupMessageListener(panel, context);
 }
+
+function setupMessageListener(webviewPanel, context) {
+    webviewPanel.webview.onDidReceiveMessage(
+        async message => {
+            switch (message.command) {
+                case 'submitQuery':
+                    await processQuery(message.text, context, webviewPanel);
+                    break;
+            }
+        },
+        undefined,
+        context.subscriptions
+    );
+}
+
+async function processQuery(userInput, context, webviewPanel) {
+    const apiKey = await getApiKey(context);
+    if (!apiKey) return;
+
+    try {
+        const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, context.globalState.get('selectedOpenAIModel'));
+        conversationHistory.inputs.push(userInput);
+        conversationHistory.responses.push(gptResponse);
+
+        // Check if the webview is currently open
+        if (webviewPanel && webviewPanel.visible) {
+            // Webview is open, so update it with new content
+            webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+        } else {
+            // Webview is not open, so show notification with response
+            const showWebviewOption = 'Continue in Webview';
+            const selectedOption = await vscode.window.showInformationMessage(gptResponse, showWebviewOption);
+
+            // If user chooses to open webview, then create or show it
+            if (selectedOption === showWebviewOption) {
+                if (!webviewPanel) {
+                    webviewPanel = webviewManager.createWebviewPanel(context);
+                }
+                webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+                webviewPanel.reveal(); // This makes sure the webview is focused
+            }
+        }
+    } catch (error) {
+        vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
+    }
+}
+
 
 async function getApiKey(context) {
     let apiKey = context.globalState.get('openaiApiKey');
