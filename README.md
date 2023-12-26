@@ -14,25 +14,69 @@ FrankGPT is a sophisticated VSCode extension that seamlessly integrates OpenAI's
 - **VSCode Version**: 1.85.0 or later.
 - **Internet Connection**: Required for ChatGPT interactions.
 
-## Extension Settings
+## FrankGPT OpenAI ChatGPT Extension Functionalities
 
-- `frankgpt.enable`: Enable/disable ChatGPT integration.
-- `frankgpt.maxTokens`: Set maximum token count for responses.
-- **API Key Management**:
-  - `frankgpt.setApiKey`: Set OpenAI API key.
-  - `frankgpt.clearApiKey`: Clear stored API key.
+### General Features
+- `frankgpt.enable`: Enable/disable the FrankGPT extension.
+- `frankgpt.maxTokens`: Set the maximum token count for ChatGPT responses.
 
-## Model Selection
-- `frankgpt.selectModel`: Choose from a range of OpenAI models for different needs:
-  - **Ada**: Cost-effective for basic tasks, quick responses.
-  - **Babbage**: Good balance for general tasks, moderately priced.
-  - **Curie**: Higher quality, suitable for complex tasks, more expensive.
-  - **Davinci**: Highest quality for the most complex tasks, most expensive.
-  - **GPT-3.5 Turbo**: Advanced tasks with an optimized balance of performance and cost.
+### API Key Management
+- `frankgpt.setApiKey`: Command to set your OpenAI API key.
+- `frankgpt.clearApiKey`: Clear the stored OpenAI API key.
 
-## Code Analysis
+### Model Selection
+- `frankgpt.selectModel`: Choose from various OpenAI models:
+  - **Ada**: Efficient for basic tasks with quick responses.
+  - **Babbage**: Balanced performance for general tasks.
+  - **Curie**: High-quality output for complex tasks.
+  - **Davinci**: Top-tier quality for the most intricate tasks.
+  - **GPT-3.5 Turbo**: Optimized for advanced tasks balancing performance and cost.
 
-First you must select the ChatGPT 3.5 Turbo then have a file opened in an editor then trap a segment of code with `///analysis start` ...code... `///analysis end` Then do `CTRL` + `ALT` + `A` or `FrankGPT: Analyze Code` and wait for the response.
+### ChatGPT Integration
+- `frankgpt.askGPT`: Interact with ChatGPT by asking questions or submitting prompts.
+- `frankgpt.analyzeCode`: Analyze code blocks within your editor. Enclose the code segment with `///analysis start` and `///analysis end` markers, then use `CTRL` + `ALT` + `A` or the `FrankGPT: Analyze Code` command.
+- `frankgpt.openWebview`: Open a webview panel to display ChatGPT responses.
+
+### Webview Management
+- Manages the content of webviews to display ChatGPT conversations, including inputs and responses.
+
+### Additional Commands
+- `frankgpt.helloWorld`: A simple command to display a greeting message and confirm the extension's activation.
+- Commands to manage and interact with the extension, enhancing user experience and functionality.
+
+### Contextual Utilities
+- Contextual subscriptions and utility functions for enhanced interaction with Visual Studio Code and the ChatGPT API.
+
+### Extension Activation and Deactivation
+- Detailed activation and deactivation procedures to manage resources and settings effectively.
+
+## Prerequisites and Assumptions for Using This Tool but more for A.I. (could be opinions too)
+
+This code was kicke-off using: 
+
+### Development Experience Required:
+1. **Familiarity with VSCode**: Essential for navigating and utilizing the features of this tool.
+2. **Proficiency in Node.js Development**: A foundational skill for working effectively with this tool.
+3. **Use of NVM instead of NPM**: A tool to better manage Node and NPM versions: https://github.com/nvm-sh/nvm
+4. **Understanding of Git**: Knowledge of Git is crucial for efficient version control and managing development branches.
+5. **Yeoman and VS Code Extension Generator**: https://github.com/microsoft/vscode-generator-code
+6. **Awareness of the .vsix SDK and OpenAI API**: While not mandatory, lacking this understanding may steepen your learning curve, particularly when dealing with complex problems that may require exploratory coding and iterative development.
+7. **General coding best practices** 
+
+### Managing Expectations with A.I.:
+- **A.I. Limitations**: A.I. is a powerful tool but it's not a panacea for all coding challenges. It can streamline certain tasks but might complicate others. The key is to remain adaptable and resourceful.
+- **Self-Reliance**: A.I. assists in fostering independence, especially for solo developers or small teams. It can reduce the need for large teams by enabling individuals to handle complex tasks more efficiently.
+
+### Organizational Assumptions:
+1. **Leadership Skills**: Ability to set clear goals and expectations is crucial for guiding A.I.-assisted development.
+2. **Innovative Thinking in Coders**: Success with A.I. augmentation requires creativity, experience, and the ability to think outside the box.
+
+### The Impact of A.I. Augmentation:
+- **Team Size Reduction**: An A.I.-augmented developer could potentially replace 2-3 traditional coders in small to medium-sized projects, thanks to enhanced efficiency and productivity.
+- **Overcoming Organizational Constraints**: In scenarios where team expansion is limited by budget or other constraints, integrating A.I. can open new possibilities and expand the team's capabilities without needing additional personnel.
+
+### Conclusion:
+Incorporating A.I. into your development process is a strategic move that can elevate your capabilities and efficiency. While it requires certain skills and adjustments, the potential benefits in terms of productivity and problem-solving are substantial.
 
 ## Known Issues
 

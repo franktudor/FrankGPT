@@ -1,8 +1,8 @@
 const vscode = require('vscode');
-const chatGPT = require('./chatgpt-api-calls');
-const apiKeyManager = require('./api-key-manager');
-const modelSelector = require('./model-selector');
-const webviewManager = require('./webview-manager');
+const chatGPT = require('./modules/chatgpt-api-calls');
+const apiKeyManager = require('./modules/api-key-manager');
+const modelSelector = require('./modules/model-selector');
+const webviewManager = require('./modules/webview-manager');
 
 let conversationHistory = {
     inputs: [],
