@@ -19,15 +19,6 @@ function activate(context) {
     registerCommand(context, 'frankgpt.clearApiKey', () => apiKeyManager.clearApiKey(context));
     registerCommand(context, 'frankgpt.analyzeCode', () => handleAnalyzeCode(context));
     registerCommand(context, 'frankgpt.openWebview', () => handleOpenWebview(context));
-
-    // Update to handle message from the webview
-    context.subscriptions.push(vscode.window.registerWebviewPanelSerializer('chatGPTResponse', {
-        async deserializeWebviewPanel(webviewPanel, state) {
-            // Use state if needed to restore webview state
-            webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-            setupMessageListener(webviewPanel, context);
-        }
-    }));
 }
 
 function deactivate(context) {

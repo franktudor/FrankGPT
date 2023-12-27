@@ -33,7 +33,7 @@ function getWebviewContent(userInputs, responses) {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>ChatGPT Interaction</title>
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'vscode-resource:'; style-src vscode-resource: 'unsafe-inline';">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-eval' 'unsafe-inline' vscode-resource:; style-src vscode-resource: 'unsafe-inline';">
         </head>
         <body>
             ${conversationHistory}
@@ -56,12 +56,12 @@ function getWebviewContent(userInputs, responses) {
                             command: 'submitQuery',
                             text: userInput
                         });
-                        console.log('Message posted to extension'); // Debug log
+                        console.log('Message posted to extension', { command: 'submitQuery', text: userInput }); // Enhanced debug log
                     } catch (error) {
                         console.error('Error posting message:', error); // Error log
                     }
 
-                    document.getElementById('userInput').value = ''; // Clear the text area
+                    document.getElementById('userInput').value = ''; // Clear the text area after sending
                 });
 
                 // Debug listener for messages sent back to the webview
