@@ -54,9 +54,22 @@ async function handleAskGPT(context) {
             const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, context.globalState.get('selectedOpenAIModel'));
             conversationHistory.inputs.push(userInput);
             conversationHistory.responses.push(gptResponse);
-            const panel = webviewManager.createWebviewPanel(context);
-            panel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-            setupMessageListener(panel, context);
+
+            // Log the response to the console
+            // console.log('GPT Response:', gptResponse);
+            vscode.window.showInformationMessage('GPT Response:', gptResponse);
+
+            // Ask the user if they want to open the response in a webview
+            const openInWebview = await vscode.window.showInformationMessage(
+                'Do you want to view the response in a more detailed view?',
+                'Yes', 'No'
+            );
+
+            if (openInWebview === 'Yes') {
+                const panel = webviewManager.createWebviewPanel(context);
+                panel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+                setupMessageListener(panel, context);
+            }
         } catch (error) {
             vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
         }
