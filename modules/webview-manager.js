@@ -4,8 +4,11 @@ function createWebviewPanel(context) {
     const panel = vscode.window.createWebviewPanel(
         'chatGPTResponse',
         'ChatGPT Response',
-        vscode.ViewColumn.One,
-        {}
+        vscode.ViewColumn.One, // Editor column to show the new webview panel in
+        {
+            // Enable scripts in the webview
+            enableScripts: true
+        }
     );
 
     context.subscriptions.push(panel);

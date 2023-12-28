@@ -143,7 +143,6 @@ async function processQuery(userInput, context, webviewPanel) {
     }
 }
 
-
 async function getApiKey(context) {
     let apiKey = context.globalState.get('openaiApiKey');
     if (!apiKey) {
