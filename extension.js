@@ -115,31 +115,34 @@ async function processQuery(userInput, context, webviewPanel) {
     const apiKey = await getApiKey(context);
     if (!apiKey) return;
 
+    // Update conversation history with user input and a placeholder for the response
+    conversationHistory.inputs.push(userInput);
+    conversationHistory.responses.push("Generating response...");
+
+    // Update the webview immediately with the user input and loading state
+    if (webviewPanel && webviewPanel.visible) {
+        webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+    }
+
     try {
         const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, context.globalState.get('selectedOpenAIModel'));
-        conversationHistory.inputs.push(userInput);
-        conversationHistory.responses.push(gptResponse);
 
-        // Check if the webview is currently open
+        // Replace the loading state with the actual response
+        conversationHistory.responses[conversationHistory.responses.length - 1] = gptResponse;
+
+        // Update the webview with the new response
         if (webviewPanel && webviewPanel.visible) {
-            // Webview is open, so update it with new content
             webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-        } else {
-            // Webview is not open, so show notification with response
-            const showWebviewOption = 'Continue in Webview';
-            const selectedOption = await vscode.window.showInformationMessage(gptResponse, showWebviewOption);
-
-            // If user chooses to open webview, then create or show it
-            if (selectedOption === showWebviewOption) {
-                if (!webviewPanel) {
-                    webviewPanel = webviewManager.createWebviewPanel(context);
-                }
-                webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-                webviewPanel.reveal(); // This makes sure the webview is focused
-            }
         }
     } catch (error) {
         vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
+        // Replace the loading state with an error message
+        conversationHistory.responses[conversationHistory.responses.length - 1] = "Error generating response.";
+
+        // Update the webview with the error message
+        if (webviewPanel && webviewPanel.visible) {
+            webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+        }
     }
 }
 

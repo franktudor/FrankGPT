@@ -37,15 +37,56 @@ function getWebviewContent(userInputs, responses) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>ChatGPT Interaction</title>
             <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-eval' 'unsafe-inline' vscode-resource:; style-src vscode-resource: 'unsafe-inline';">
+            <style>
+                /* Style for the warning message */
+                .warning {
+                    background-color: #FFA500; /* Light orange background */
+                    color: black; /* Black text */
+                    font-weight: bold; /* Bold text */
+                    text-align: center;
+                    padding: 10px;
+                    border-bottom: 1px solid black; /* Optional: adds a border line below the warning */
+                }
+
+                /* Style for the entire container */
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100vh;
+                }
+
+                /* Conversation history styling */
+                .conversation-history {
+                    flex-grow: 1; /* Takes up available space */
+                    overflow-y: auto; /* Enables vertical scrolling */
+                    padding: 10px;
+                }
+
+                /* Style to make the input area stick to the bottom */
+                .input-area {
+                    padding: 10px;
+                    background: #f3f3f3; /* Just for better visibility */
+                }
+            </style>
         </head>
         <body>
-            ${conversationHistory}
-
-            <div>
-                <h2>New Input:</h2>
-                <textarea id="userInput" rows="4" cols="50"></textarea>
-                <button id="submitButton">Submit</button>
+        <div class="container">
+        <!-- Warning message at the top -->
+            <div class="warning">
+            Please do not enter any sensitive information such as usernames, passwords, or API keys.
             </div>
+            <!-- Conversation history -->
+            <div class="conversation-history">
+            ${conversationHistory}
+            </div>
+
+            <!-- Input area that sticks to the bottom -->
+            <div class="input-area">
+            <h2>New Input:</h2>
+            <textarea id="userInput" rows="4" cols="50"></textarea>
+            <button id="submitButton">Submit</button>
+            </div>
+        </div>
 
             <script>
                 const vscode = acquireVsCodeApi();
@@ -71,6 +112,12 @@ function getWebviewContent(userInputs, responses) {
                 window.addEventListener('message', event => {
                     console.log('Message received in webview:', event.data);
                 });
+                function scrollToBottom() {
+                    const conversationHistoryElement = document.querySelector('.conversation-history');
+                    conversationHistoryElement.scrollTop = conversationHistoryElement.scrollHeight;
+                  }
+                // Scroll to the bottom
+                scrollToBottom();  
             </script>
         </body>
         </html>`;
