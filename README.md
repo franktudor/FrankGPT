@@ -85,6 +85,9 @@ Incorporating A.I. into your development process is a strategic move that can el
 
 ## Release Notes
 
+### 0.0.7
+- fixed webview
+
 ### 0.0.6
 - Context-aware assistance and real-time code suggestions improvements.
 - Fixed GPT-3.5 Turbo.
