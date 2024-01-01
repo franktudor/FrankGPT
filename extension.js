@@ -2,7 +2,8 @@ const vscode = require('vscode');
 const chatGPT = require('./modules/chatgpt-api-calls');
 const apiKeyManager = require('./modules/api-key-manager');
 const modelSelector = require('./modules/model-selector');
-const webviewManager = require('./modules/webview-manager');
+const path = require('path');
+// In your webview content script
 
 let conversationHistory = {
     inputs: [],
@@ -12,12 +13,11 @@ let conversationHistory = {
 function activate(context) {
     console.log('FrankGPT extension is now active.');
 
-    registerCommand(context, 'frankgpt.helloWorld', displayHelloWorld);
+    registerCommand(context, 'frankgpt.helloWorld', () => vscode.window.showInformationMessage('FrankGPT functions yay!'));
     registerCommand(context, 'frankgpt.selectModel', () => modelSelector.selectModel(context));
     registerCommand(context, 'frankgpt.askGPT', () => handleAskGPT(context));
     registerCommand(context, 'frankgpt.setApiKey', () => apiKeyManager.setApiKey(context));
     registerCommand(context, 'frankgpt.clearApiKey', () => apiKeyManager.clearApiKey(context));
-    registerCommand(context, 'frankgpt.analyzeCode', () => handleAnalyzeCode(context));
     registerCommand(context, 'frankgpt.openWebview', () => handleOpenWebview(context));
 }
 
@@ -31,10 +31,6 @@ function registerCommand(context, commandId, commandFunc) {
     context.subscriptions.push(disposable);
 }
 
-function displayHelloWorld() {
-    vscode.window.showInformationMessage('FrankGPT functions yay!');
-}
-
 async function handleAskGPT(context) {
     const apiKey = await getApiKey(context);
     if (!apiKey) return;
@@ -46,20 +42,15 @@ async function handleAskGPT(context) {
             conversationHistory.inputs.push(userInput);
             conversationHistory.responses.push(gptResponse);
 
-            // Log the response to the console
-            // console.log('GPT Response:', gptResponse);
             vscode.window.showInformationMessage('GPT Response:', gptResponse);
 
-            // Ask the user if they want to open the response in a webview
             const openInWebview = await vscode.window.showInformationMessage(
                 'Do you want to view the response in a more detailed view?',
                 'Yes', 'No'
             );
 
             if (openInWebview === 'Yes') {
-                const panel = webviewManager.createWebviewPanel(context);
-                panel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-                setupMessageListener(panel, context);
+                createAndSetupPanel(context);
             }
         } catch (error) {
             vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
@@ -67,34 +58,23 @@ async function handleAskGPT(context) {
     }
 }
 
-async function handleAnalyzeCode(context) {
-    let editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        vscode.window.showInformationMessage('No code found. Open a file with code to analyze.');
+function createAndSetupPanel(context) {
+    const panel = createWebviewPanel(context);
+
+    if (!context || !context.extensionUri) {
+        console.error('Context or extensionUri is not defined');
         return;
     }
 
-    const { startIndex, endIndex, lines } = findAnalysisBlock(editor.document.getText());
-    if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
-        vscode.window.showInformationMessage('Analysis block not properly defined.');
+    console.log("createAndSetupPanel: ", context);
+    const htmlContent = getWebviewContent(conversationHistory.inputs, conversationHistory.responses, context, panel.webview);
+
+    if (!panel) {
+        console.error('Panel creation failed');
         return;
     }
 
-    const selectedCode = lines.slice(startIndex + 1, endIndex).join('\n');
-    try {
-        const gptResponse = await chatGPT.getGPTResponse(selectedCode, await getApiKey(context), context.globalState.get('selectedOpenAIModel'));
-        conversationHistory.inputs.push(selectedCode);
-        conversationHistory.responses.push(gptResponse);
-        // Consider showing response in a webview here as well
-    } catch (error) {
-        vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
-    }
-}
-
-function handleOpenWebview(context) {
-    const panel = webviewManager.createWebviewPanel(context);
-    panel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-    setupMessageListener(panel, context);
+    panel.webview.html = htmlContent;
 }
 
 function setupMessageListener(webviewPanel, context) {
@@ -115,35 +95,129 @@ async function processQuery(userInput, context, webviewPanel) {
     const apiKey = await getApiKey(context);
     if (!apiKey) return;
 
-    // Update conversation history with user input and a placeholder for the response
     conversationHistory.inputs.push(userInput);
     conversationHistory.responses.push("Generating response...");
 
-    // Update the webview immediately with the user input and loading state
-    if (webviewPanel && webviewPanel.visible) {
-        webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-    }
+    updateWebview(webviewPanel, context, conversationHistory);
 
     try {
         const gptResponse = await chatGPT.getGPTResponse(userInput, apiKey, context.globalState.get('selectedOpenAIModel'));
-
-        // Replace the loading state with the actual response
         conversationHistory.responses[conversationHistory.responses.length - 1] = gptResponse;
-
-        // Update the webview with the new response
-        if (webviewPanel && webviewPanel.visible) {
-            webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
-        }
+        updateWebview(webviewPanel, context, conversationHistory);
     } catch (error) {
-        vscode.window.showErrorMessage(`FrankGPT: Error - ${error.message}`);
-        // Replace the loading state with an error message
+        vscode.window.showErrorMessage(`Error: ${error.message}`);
         conversationHistory.responses[conversationHistory.responses.length - 1] = "Error generating response.";
+        updateWebview(webviewPanel, context, conversationHistory);
+    }
+}
 
-        // Update the webview with the error message
-        if (webviewPanel && webviewPanel.visible) {
-            webviewPanel.webview.html = webviewManager.getWebviewContent(conversationHistory.inputs, conversationHistory.responses);
+function updateWebview(webviewPanel, context, conversationHistory) {
+    console.log("updateWebview: ", context);
+    if (webviewPanel && webviewPanel.visible) {
+        webviewPanel.webview.html = getWebviewContent(conversationHistory.inputs, conversationHistory.responses, context, webviewPanel.webview);
+    }
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function formatResponse(response) {
+    const parts = response.split(/```/);
+    let formattedResponse = '';
+
+    for (let i = 0; i < parts.length; i++) {
+        const code = escapeHtml(parts[i]);
+        if (i % 2 === 0) {
+            formattedResponse += `<p>${code}</p>`;
+        } else {
+            formattedResponse += `
+                <pre><code class="language-javascript">${code}</code></pre>
+                <button class="copy-button" data-clipboard-text="${code}">Copy</button>`;
         }
     }
+    return formattedResponse;
+}
+
+function generateConversationHistory(userInputs, responses) {
+    return userInputs.map((input, index) => `
+        <div>
+            <h2>User Input:</h2>
+            <p>${input}</p>
+            <h2>ChatGPT Response:</h2>
+            ${formatResponse(responses[index])}
+        </div>
+    `).join('');
+}
+
+function getNonce() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
+function createWebviewPanel() {
+    const extensionUri = vscode.Uri.joinPath(
+        vscode.Uri.file('/'), // The root directory (file:/)
+        'frankgpt'
+      );
+    return vscode.window.createWebviewPanel(
+        'chatGPTResponse',
+        'ChatGPT Response',
+        vscode.ViewColumn.One,
+        {
+            enableScripts: true,
+            localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'includes')]
+        }
+    );
+}
+
+function getWebviewContent(userInputs, responses, context, webview) {
+    const nonce = getNonce();
+    const conversationHistory = generateConversationHistory(userInputs, responses);
+    const extensionUri = vscode.Uri.joinPath(
+        vscode.Uri.file('/'), // The root directory (file:/)
+        'frankgpt'
+      );
+    const uris = ['style.css', 'prism.css', 'script.js', 'prism.js'].map(file =>
+        webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, 'includes', file))
+    );
+    
+    const [styleUri, prismStyleUri, scriptUri, prismScriptUri] = uris;
+
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} https: data:; style-src ${webview.cspSource}; script-src ${webview.cspSource};">
+            <link nonce="${nonce}" href="${prismStyleUri}" rel="stylesheet" />
+            <link nonce="${nonce}" href="${styleUri}" rel="stylesheet" />
+        </head>
+        <body>
+        <div class="container">
+            <div class="warning">Please do not enter any sensitive information such as usernames, passwords, or API keys.</div>
+            <div class="conversation-history">${conversationHistory}</div>
+            <div class="input-area">
+                <h2>New Input:</h2>
+                <textarea id="userInput" rows="4" cols="50"></textarea>
+                <button id="submitButton">Submit</button>
+            </div>
+        </div>
+            <script nonce="${nonce}" src="${prismScriptUri}"></script>
+            <script nonce="${nonce}" src="${scriptUri}"></script>
+        </body>
+        </html>
+    `;
+
+    return htmlContent;
 }
 
 async function getApiKey(context) {
@@ -159,14 +233,7 @@ async function getApiKey(context) {
     return apiKey;
 }
 
-function findAnalysisBlock(text) {
-    const lines = text.split('\n');
-    let startIndex = -1, endIndex = -1;
-    for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes('///analysis start') && startIndex === -1) startIndex = i;
-        else if (lines[i].includes('///analysis end') && endIndex === -1) endIndex = i;
-    }
-    return { startIndex, endIndex, lines };
-}
-
-module.exports = { activate, deactivate };
+module.exports = {
+    activate,
+    deactivate
+};
