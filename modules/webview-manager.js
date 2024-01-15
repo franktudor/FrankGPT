@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const showdown = require('showdown');
 
 function createWebviewPanel(context) {
     const panel = vscode.window.createWebviewPanel(
@@ -15,20 +16,35 @@ function createWebviewPanel(context) {
     return panel;
 }
 
+// Function to generate a nonce for CSP
+function getNonce() {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+}
+
 function getWebviewContent(userInputs, responses) {
+    // Create a Showdown converter
+    let converter = new showdown.Converter({sanitize: true});
     // Generate the conversation history
     let conversationHistory = '';
     for (let i = 0; i < userInputs.length; i++) {
+    // Convert ChatGPT response from Markdown to HTML
+    let responseHtml = converter.makeHtml(responses[i]);
+
         conversationHistory += `
             <div>
                 <h2>User Input:</h2>
                 <p>${userInputs[i]}</p>
                 <h2>ChatGPT Response:</h2>
-                <p>${responses[i]}</p>
+                <div>${responseHtml}</div>
             </div>
         `;
     }
-
+    const nonce = getNonce();
     // HTML content for the webview
     return `<!DOCTYPE html>
         <html lang="en">
@@ -36,8 +52,9 @@ function getWebviewContent(userInputs, responses) {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>ChatGPT Interaction</title>
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-eval' 'unsafe-inline' vscode-resource:; style-src vscode-resource: 'unsafe-inline';">
-            <style>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline' https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/; script-src 'nonce-${nonce}' https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/; img-src https:; connect-src https:;">
+            <style nonce="${nonce}">
                 /* Style for the warning message */
                 .warning {
                     background-color: #FFA500; /* Light orange background */
@@ -77,7 +94,9 @@ function getWebviewContent(userInputs, responses) {
             </div>
             <!-- Conversation history -->
             <div class="conversation-history">
-            ${conversationHistory}
+            <div class="container">
+                ${conversationHistory}
+            </div>
             </div>
 
             <!-- Input area that sticks to the bottom -->
@@ -87,40 +106,47 @@ function getWebviewContent(userInputs, responses) {
             <button id="submitButton">Submit</button>
             </div>
         </div>
-
-            <script>
-                const vscode = acquireVsCodeApi();
-                
-                document.getElementById('submitButton').addEventListener('click', () => {
-                    const userInput = document.getElementById('userInput').value;
-                    console.log('Button clicked. User input:', userInput); // Debug log
-
-                    try {
-                        vscode.postMessage({
-                            command: 'submitQuery',
-                            text: userInput
-                        });
-                        console.log('Message posted to extension', { command: 'submitQuery', text: userInput }); // Enhanced debug log
-                    } catch (error) {
-                        console.error('Error posting message:', error); // Error log
-                    }
-
-                    document.getElementById('userInput').value = ''; // Clear the text area after sending
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+        <script nonce="${nonce}">
+            document.addEventListener('DOMContentLoaded', (event) => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
                 });
+            });
+        </script>
+        <script nonce="${nonce}">
+            const vscode = acquireVsCodeApi();
+            
+            document.getElementById('submitButton').addEventListener('click', () => {
+                const userInput = document.getElementById('userInput').value;
+                console.log('Button clicked. User input:', userInput); // Debug log
 
-                // Debug listener for messages sent back to the webview
-                window.addEventListener('message', event => {
-                    console.log('Message received in webview:', event.data);
-                });
-                function scrollToBottom() {
-                    const conversationHistoryElement = document.querySelector('.conversation-history');
-                    conversationHistoryElement.scrollTop = conversationHistoryElement.scrollHeight;
-                  }
-                // Scroll to the bottom
-                scrollToBottom();  
-            </script>
-        </body>
-        </html>`;
+                try {
+                    vscode.postMessage({
+                        command: 'submitQuery',
+                        text: userInput
+                    });
+                    console.log('Message posted to extension', { command: 'submitQuery', text: userInput }); // Enhanced debug log
+                } catch (error) {
+                    console.error('Error posting message:', error); // Error log
+                }
+
+                document.getElementById('userInput').value = ''; // Clear the text area after sending
+            });
+
+            // Debug listener for messages sent back to the webview
+            window.addEventListener('message', event => {
+                console.log('Message received in webview:', event.data);
+            });
+            function scrollToBottom() {
+                const conversationHistoryElement = document.querySelector('.conversation-history');
+                conversationHistoryElement.scrollTop = conversationHistoryElement.scrollHeight;
+                }
+            // Scroll to the bottom
+            scrollToBottom();  
+        </script>
+    </body>
+    </html>`;
 }
 
 module.exports = {
