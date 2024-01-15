@@ -20,7 +20,7 @@ suite('Extension Test Suite', () => {
 		await activate(context);
 
 		// Simulate calling the askChatGPT command
-		await vscode.commands.executeCommand('frankgpt.askGPT');
+		await vscode.commands.executeCommand('askGPT');
 
 		// Verify the effect of the command (e.g., webview content, state change)
 		// ...
@@ -51,6 +51,13 @@ suite('Extension Test Suite', () => {
 		// Mock the necessary methods to test API key setting and clearing
 		// ...
 		// Perform tests on setting and clearing API key
+		// ...
+	});
+
+	// Test analysis of code
+	test('Analyze Code', async () => {
+		let context = { globalState: new MockMemento() };
+		// Mock the necessary methods and perform tests
 		// ...
 	});
 

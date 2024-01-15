@@ -12,13 +12,13 @@ let conversationHistory = {
 function activate(context) {
     console.log('FrankGPT extension is now active.');
 
-    registerCommand(context, 'frankgpt.helloWorld', displayHelloWorld);
-    registerCommand(context, 'frankgpt.selectModel', () => modelSelector.selectModel(context));
-    registerCommand(context, 'frankgpt.askGPT', () => handleAskGPT(context));
-    registerCommand(context, 'frankgpt.setApiKey', () => apiKeyManager.setApiKey(context));
-    registerCommand(context, 'frankgpt.clearApiKey', () => apiKeyManager.clearApiKey(context));
-    registerCommand(context, 'frankgpt.analyzeCode', () => handleAnalyzeCode(context));
-    registerCommand(context, 'frankgpt.openWebview', () => handleOpenWebview(context));
+    registerCommand(context, 'helloWorld', displayHelloWorld);
+    registerCommand(context, 'selectModel', () => modelSelector.selectModel(context));
+    registerCommand(context, 'askGPT', () => handleAskGPT(context));
+    registerCommand(context, 'setApiKey', () => apiKeyManager.setApiKey(context));
+    registerCommand(context, 'clearApiKey', () => apiKeyManager.clearApiKey(context));
+    registerCommand(context, 'analyzeCode', () => handleAnalyzeCode(context));
+    registerCommand(context, 'openWebview', () => handleOpenWebview(context));
 }
 
 function deactivate(context) {

@@ -8,7 +8,7 @@ const ANALYSIS_START = '///analysis start';
 const ANALYSIS_END = '///analysis end';
 
 function activate(context) {
-    let analyzeCodeCommand = vscode.commands.registerCommand('frankgpt.analyzeCode', () => analyzeCode(context));
+    let analyzeCodeCommand = vscode.commands.registerCommand('analyzeCode', () => analyzeCode(context));
     context.subscriptions.push(analyzeCodeCommand);
 }
 
